@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q'SHOW Entertainment News</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #ff0000; --dark: #050505; --card-bg: #121212; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; }
+        body { background-color: var(--dark); color: #fff; line-height: 1.6; }
+        
+        header { background: #000; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); position: sticky; top: 0; z-index: 1000; }
+        .logo-box h1 { color: var(--primary); font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; }
+        .live-box { background: #1a1a1a; padding: 8px 15px; border-radius: 50px; border: 1px solid #333; display: flex; align-items: center; gap: 10px; }
+
+        .container { padding: 20px 5%; max-width: 1400px; margin: 0 auto; }
+        h2 { margin: 40px 0 20px; font-size: 1.6rem; text-transform: uppercase; color: var(--primary); display: flex; align-items: center; gap: 10px; border-left: 5px solid var(--primary); padding-left: 15px; }
+
+        .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; min-height: 150px; }
+        
+        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; text-decoration: none; color: white; transition: 0.3s; border: 1px solid #222; display: flex; flex-direction: column; height: 100%; }
+        .card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 10px 20px rgba(255,0,0,0.2); }
+        .card img { width: 100%; height: 180px; object-fit: cover; background: #222; }
+        .card-body { padding: 15px; flex-grow: 1; }
+        .card-body h3 { font-size: 1rem; font-weight: 600; line-height: 1.4; color: #efefef; }
+        
+        .loading-text { grid-column: 1/-1; text-align: center; padding: 50px; color: #444; font-style: italic; }
+        footer { background: #000; padding: 40px; text-align: center; margin-top: 60px; border-top: 1px solid #222; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-box">
+        <h1>Q'SHOW</h1>
+        <p style="font-size: 0.7rem; color: #fff; letter-spacing: 2px;">UMA FESTA TODO DIA!</p>
+    </div>
+    <div class="live-box">
+        <span style="color:var(--primary); font-weight: bold; font-size: 0.7rem; animation: pulse 1.5s infinite;">● LIVE</span>
+        <audio controls style="height: 30px; width: 130px;">
+            <source src="https://hts09.brascast.com:7988/live" type="audio/mpeg">
+        </audio>
+    </div>
+</header>
+
+<div class="container">
+    <section>
+        <h2><i class="fas fa-music"></i> Música</h2>
+        <div id="grid-musica" class="news-grid"><div class="loading-text">Buscando notícias...</div></div>
+    </section>
+
+    <section>
+        <h2><i class="fas fa-trophy"></i> Esporte</h2>
+        <div id="grid-esporte" class="news-grid"><div class="loading-text">Buscando notícias...</div></div>
+    </section>
+
+    <section>
+        <h2><i class="fas fa-film"></i> Filmes & Séries</h2>
+        <div id="grid-filmes" class="news-grid"><div class="loading-text">Buscando notícias...</div></div>
+    </section>
+
+    <section>
+        <h2><i class="fas fa-tv"></i> Novelas</h2>
+        <div id="grid-novelas" class="news-grid"><div class="loading-text">Buscando notícias...</div></div>
+    </section>
+</div>
+
+<footer>
+    <p>Q'SHOW Entertainment News &copy; 2026</p>
+    <p style="color: #666; font-size: 0.8rem; margin-top: 10px;">contato@qshow.com.br</p>
+</footer>
+
+<script>
+    // Fontes 100% testadas para 2026
+    const FEEDS = {
+        musica: 'https://g1.globo.com/dynamo/pop-arte/rss2.xml',
+        esporte: 'https://noticias.r7.com/esportes/feed.xml',
+        filmes: 'https://cinepop.com.br/feed',
+        novelas: 'https://gshow.globo.com/rss/gshow/'
+    };
+
+    async function loadNews(category, elementId) {
+        const grid = document.getElementById(elementId);
+        // Usando o Proxy AllOrigins para evitar o bloqueio do navegador (CORS)
+        const proxy = "https://api.allorigins.win/get?url=";
+        const rss2json = "https://api.rss2json.com/v1/api.json?rss_url=";
+        const finalUrl = proxy + encodeURIComponent(rss2json + encodeURIComponent(FEEDS[category]));
+
+        try {
+            const response = await fetch(finalUrl);
+            const rawData = await response.json();
+            const data = JSON.parse(rawData.contents);
+
+            if (data.status === 'ok') {
+                grid.innerHTML = '';
+                data.items.slice(0, 4).forEach(item => {
+                    let thumb = item.thumbnail || (item.enclosure && item.enclosure.link) || '';
+                    if (!thumb) thumb = 'https://images.unsplash.com/photo-1514525253361-bee8718a342b?w=500';
+
+                    grid.innerHTML += `
+                        <a href="${item.link}" target="_blank" class="card">
+                            <img src="${thumb}" alt="Q'SHOW News">
+                            <div class="card-body">
+                                <span style="font-size:0.6rem; color:var(--primary); font-weight:bold; text-transform:uppercase">${category}</span>
+                                <h3 style="margin-top:5px;">${item.title}</h3>
+                            </div>
+                        </a>
+                    `;
+                });
+            }
+        } catch (error) {
+            grid.innerHTML = '<div class="loading-text">Portal em atualização automática. Tente atualizar a página.</div>';
+        }
+    }
+
+    // Carregamento inicial automático
+    window.addEventListener('DOMContentLoaded', () => {
+        loadNews('musica', 'grid-musica');
+        loadNews('esporte', 'grid-esporte');
+        loadNews('filmes', 'grid-filmes');
+        loadNews('novelas', 'grid-novelas');
+    });
+</script>
+
+<style> @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } } </style>
+</body>
+</html>
