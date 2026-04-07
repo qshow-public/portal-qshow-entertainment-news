@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q'SHOW Entertainment News - Uma Festa Todo Dia!</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #E50914; /* Vermelho Q'SHOW */
+            --bg-dark: #000000;
+            --card-bg: #141414;
+            --text-light: #ffffff;
+            --text-gray: #b3b3b3;
+            
+            /* Cores dos Gradientes dos Cards */
+            --grad-azul: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            --grad-verde: linear-gradient(135deg, #96e6a1 0%, #d4fc79 100%);
+            --grad-roxo: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); line-height: 1.4; overflow-x: hidden; }
+
+        /* Header Premium */
+        header {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+            padding: 20px 5%;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area h1 { color: var(--primary); font-size: 2.4rem; letter-spacing: 2px; font-weight: 900; }
+        .logo-area span { font-size: 0.8rem; color: #fff; text-transform: uppercase; display: block; margin-top: -5px; letter-spacing: 1px; }
+
+        .player-container {
+            background: rgba(229, 9, 20, 0.2);
+            padding: 8px 15px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid var(--primary);
+        }
+        audio { height: 25px; width: 120px; outline: none; }
+
+        /* Hero Streaming */
+        .hero {
+            height: 50vh;
+            background: linear-gradient(rgba(0,0,0,0.5), var(--bg-dark)), 
+                        url('https://images.unsplash.com/photo-1514525253344-f814d074e015?q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 5%;
+        }
+        .hero p { color: var(--primary); font-weight: bold; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+        .hero h2 { font-size: 3.5rem; max-width: 800px; line-height: 1; margin-top: 10px; font-weight: 800; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+
+        /* Conteúdo Principal */
+        .container { padding: 30px 5% 80px; }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            font-size: 1.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+        .section-title i { color: var(--primary); }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        /* CARD DESIGN FINAL (Streaming + Q'SHOW Branding) */
+        .news-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #222;
+        }
+
+        .news-card:hover { 
+            transform: scale(1.03); 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.7); 
+            border-color: #444;
+        }
+        
+        /* Container da Imagem com Gradiente e Marca D'água */
+        .card-image-wrapper {
+            width: 100%;
+            height: 210px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Marca D'água Centralizada */
+        .watermark {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Gradientes definidos por classe (atribuídos via JS) */
+        .azul { background: var(--grad-azul); }
+        .verde { background: var(--grad-verde); }
+        .roxo { background: var(--grad-roxo); }
+
+        /* Corpo do Card */
+        .card-body { 
+            padding: 20px; 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between;
+        }
+        
+        .card-body h3 { 
+            font-size: 1.15rem; 
+            color: #fff; 
+            font-weight: 700; 
+            margin-bottom: 10px;
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            line-height: 1.3;
+        }
+        
+        .card-body p { 
+            color: var(--text-gray); 
+            font-size: 0.9rem; 
+            margin-bottom: 15px; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 3; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+            margin-top: auto;
+        }
+
+        .btn-link { 
+            color: var(--primary); 
+            font-weight: bold; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            text-decoration: none; 
+            letter-spacing: 1px;
+        }
+        
+        .source-tag {
+            font-size: 0.7rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        /* Footer Portal */
+        footer { background: #000; padding: 60px 5%; text-align: center; border-top: 1px solid #333; }
+        footer h1 { color: var(--primary); font-size: 2.5rem; margin-bottom: 10px; }
+        .social { margin: 20px 0; font-size: 1.8rem; }
+        .social a { color: #fff; margin: 0 15px; transition: 0.3s; }
+        .social a:hover { color: var(--primary); transform: scale(1.1); }
+        footer p { color: #888; font-size: 0.9rem; }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            header { flex-direction: column; background: #000; padding: 15px; position: relative; gap: 10px; }
+            .hero h2 { font-size: 2.2rem; }
+            .news-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-area">
+            <h1>Q'SHOW</h1>
+            <span>Entertainment News</span>
+        </div>
+        <div class="player-container">
+            <span style="font-size: 0.6rem; font-weight: bold; color: #fff;"><i class="fas fa-broadcast-tower" style="color:var(--primary);"></i> AO VIVO</span>
+            <audio controls><source src="https://hts09.brascast.com:7988/live" type="audio/mpeg"></audio>
+        </div>
+    </header>
+
+    <section class="hero">
+        <p>Q'SHOW – Uma Festa Todo Dia!</p>
+        <h2>O seu portal de entretenimento 24h em 2026.</h2>
+    </section>
+
+    <div class="container">
+        <h2 class="section-title"><i class="fas fa-music"></i> Cultura & Música</h2>
+        <div id="feed-cultura" class="news-grid">Carregando a vibe...</div>
+
+        <h2 class="section-title"><i class="fas fa-trophy"></i> Esportes</h2>
+        <div id="feed-esportes" class="news-grid">Aquecendo...</div>
+
+        <h2 class="section-title"><i class="fas fa-star"></i> TV & Variedades</h2>
+        <div id="feed-geral" class="news-grid">Sintonizando...</div>
+    </div>
+
+    <footer>
+        <h1>Q'SHOW</h1>
+        <p>Uma Festa Todo Dia!</p>
+        <div class="social">
+            <a href="https://www.instagram.com/qshowweb"><i class="fab fa-instagram"></i></a>
+            <a href="https://m.youtube.com/@qshowweb"><i class="fab fa-youtube"></i></a>
+            <a href="mailto:contato@qshow.com.br"><i class="fas fa-envelope"></i></a>
+        </div>
+        <p>contato@qshow.com.br | © 2026</p>
+        <p style="font-size: 0.7rem; color: #444; margin-top: 15px;">Fonte das Notícias: Agência Brasil (EBC)</p>
+    </footer>
+
+    <script>
+        // Configuração dos Feeds da Agência Brasil
+        const FEEDS_CONFIG = {
+            cultura: 'https://agenciabrasil.ebc.com.br/rss/cultura/feed.xml',
+            esportes: 'https://agenciabrasil.ebc.com.br/rss/esportes/feed.xml',
+            geral: 'https://agenciabrasil.ebc.com.br/rss/geral/feed.xml'
+        };
+
+        // Mapeamento de cores solicitado
+        const CORES_CARDS = ['azul', 'verde', 'roxo'];
+
+        async function carregarNoticias(categoriaKey, elementId) {
+            // URL da API rss2json para converter o RSS em JSON legível pelo navegador
+            const apiURL = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(FEEDS_CONFIG[categoriaKey])}`;
+            
+            try {
+                const response = await fetch(apiURL);
+                if (!response.ok) throw new Error('Erro de conexão');
+                const data = await response.json();
+                
+                const container = document.getElementById(elementId);
+                container.innerHTML = ''; // Limpa o "Carregando..."
+
+                // Validação de dados
+                if (!data.items || data.items.length === 0) {
+                    container.innerHTML = "<p style='color:#666; grid-column: 1/-1; text-align:center;'>Novas notícias em breve...</p>";
+                    return;
+                }
+
+                // Pega exatamente as 3 primeiras notícias
+                const noticias = data.items.slice(0, 3);
+
+                noticias.forEach((item, index) => {
+                    // Define a cor do gradiente baseada no índice (0=azul, 1=verde, 2=roxo)
+                    const corGradient = CORES_CARDS[index];
+                    
+                    // Limpeza e resumo da descrição
+                    let descricaoLimpa = item.description.replace(/<[^>]*>?/gm, '').trim();
+                    if(descricaoLimpa.length > 130) {
+                        descricaoLimpa = descricaoLimpa.substring(0, 130) + '...';
+                    } else if (descricaoLimpa.length < 5) {
+                        descricaoLimpa = "Clique para ler a reportagem completa no portal da Agência Brasil.";
+                    }
+
+                    // Montagem do HTML do Card com a Marca D'água
+                    const cardHtml = `
+                        <div class="news-card" onclick="window.open('${item.link}', '_blank')">
+                            <div class="card-image-wrapper ${corGradient}">
+                                <div class="watermark">Q'SHOW<br>entertainment news</div>
+                            </div>
+                            <div class="card-body">
+                                <div>
+                                    <h3>${item.title}</h3>
+                                    <p>${descricaoLimpa}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="btn-link">Ler Mais</span>
+                                    <span class="source-tag">Agência Brasil</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += cardHtml;
+                });
+
+            } catch (err) {
+                console.error(`Erro na categoria ${categoriaKey}:`, err);
+                document.getElementById(elementId).innerHTML = "<p style='color:#555; grid-column: 1/-1; text-align:center;'>Conteúdo temporariamente indisponível.</p>";
+            }
+        }
+
+        // Inicia o carregamento quando a página está pronta
+        window.addEventListener('load', () => {
+            carregarNoticias('cultura', 'feed-cultura');
+            carregarNoticias('esportes', 'feed-esportes');
+            carregarNoticias('geral', 'feed-geral');
+        });
+    </script>
+</body>
+</html>
